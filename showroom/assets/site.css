@@ -1,0 +1,66 @@
+:root {
+  --ink: #1b1b1b;
+  --paper: #fbfaf7;
+  --rule: #d8d4cb;
+  --mark: #880000;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.6 Georgia, 'Times New Roman', serif;
+}
+
+main {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+}
+
+h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 0.6rem; }
+h2 { font-size: 1.15rem; margin: 2rem 0 0.4rem; }
+p { margin: 0 0 1rem; }
+
+.lede { font-size: 1.12rem; color: #333; }
+
+.stage {
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 0.82rem;
+  color: var(--mark);
+  border-top: 1px solid var(--rule);
+  padding-top: 0.7rem;
+}
+
+.accounts { display: grid; gap: 1.2rem; margin: 1.5rem 0; }
+
+.account {
+  border: 1px solid var(--rule);
+  padding: 1rem 1.2rem;
+  background: #fff;
+}
+
+.holder { font-size: 0.95rem; color: #444; }
+
+.counts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1rem;
+  margin: 0.6rem 0 0;
+  font-size: 0.92rem;
+}
+
+.counts dt { color: #666; }
+.counts dd { margin: 0; font-variant-numeric: tabular-nums; }
+
+table.ledger { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.8rem; }
+table.ledger th, table.ledger td { text-align: left; padding: 0.3rem 0.5rem; border-bottom: 1px solid var(--rule); }
+table.ledger th { color: #666; font-weight: normal; }
+table.ledger td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.steps { padding-left: 1.2rem; font-size: 0.95rem; }
+.steps li { margin-bottom: 0.6rem; }
+
+.balance { font-variant-numeric: tabular-nums; }
