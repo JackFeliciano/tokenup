@@ -2,26 +2,29 @@
 
 declare(strict_types=1);
 
+use Tokenup\Home\Project;
 use Tokenup\Home\Sample;
 use Tokenup\Tests\Assert;
 
 return [
-    ['the sample holds three accounts', static function (): void {
-        Assert::same(3, count((new Sample())->accounts()));
+    ['the sample project sits at adjusted', static function (): void {
+        Assert::same(Project::ADJUSTED, (new Sample())->project()->stage());
     }],
-    ['the sample ledger holds four lines', static function (): void {
-        Assert::same(4, (new Sample())->ledger()->count());
-    }],
-    ['the accounts and the ledger agree', static function (): void {
-        Assert::same(true, (new Sample())->agrees());
-    }],
-    ['the held tokens add the three balances', static function (): void {
+    ['the sample divides a million tokens', static function (): void {
         $sample = new Sample();
-        $sum = 0;
-        foreach ($sample->accounts() as $account) {
-            $sum += $account->tokens();
-        }
-        Assert::same($sum, $sample->held());
-        Assert::same(216, $sample->held());
+        Assert::same(1_000_000, $sample->tokenomics()->allocated());
+        Assert::same(0, $sample->tokenomics()->unallocated());
+    }],
+    ['the sample carries five buckets', static function (): void {
+        Assert::same(5, count((new Sample())->tokenomics()->allocations()));
+    }],
+    ['the sample holds no blocker and no warning', static function (): void {
+        $review = (new Sample())->review();
+        Assert::same(0, count($review->blockers()));
+        Assert::same(0, count($review->warnings()));
+    }],
+    ['the stopped project waits at draft', static function (): void {
+        [$stopped] = (new Sample())->stopped();
+        Assert::same(Project::DRAFT, $stopped->stage());
     }],
 ];

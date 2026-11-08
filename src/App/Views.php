@@ -49,49 +49,89 @@ HTML;
 
     public function page(Sample $sample): string
     {
-        $TITLE = 'TokenUp, tokens for work done';
-        $LEDE = 'TokenUp keeps whole-number token accounts for network members and records every credit, debit and transfer in a ledger.';
-        $WHAT = 'Each member has an account that holds tokens, which represent a unit of work and carry a symbol. A credit adds tokens when work arrives. A debit takes tokens when a fee falls due, but the account refuses any debit larger than its balance. Members can transfer tokens between accounts, but cannot send tokens to themselves. Each ledger line records the account, direction, amount, reason and resulting balance. Readers can replay the lines to rebuild every account balance.';
+        $TITLE = 'TokenUp, a token project checked before it mints';
+        $LEDE = 'TokenUp helps founders build, review and launch token projects by checking the token design against its tokenomics before minting.';
+        $WHAT = 'TokenUp guides founders through token creation and tokenomics, from contract features and supply limits to allocations, vesting and treasury plans. Its review compares both drafts, identifies inconsistencies and marks each finding as a blocker or warning. Founders resolve blockers before minting, then generate a white paper from the approved tokenomics.';
+
+        $project = $sample->project();
+        $tokenomics = $sample->tokenomics();
+        $review = $sample->review();
+        $paper = $sample->paper();
 
         $out = $this->header($TITLE);
         $out .= '<h1>' . $this->h($TITLE) . '</h1>' . "\n";
         $out .= '<p class="lede">' . $this->h($LEDE) . '</p>' . "\n";
         $out .= '<p>' . $this->h($WHAT) . '</p>' . "\n";
-        $token = $sample->token();
-        $out .= '<p class="stage">Token ' . $this->h($token->symbol) . ' prices ' . $this->h($token->unit)
-            . '. Supply: ' . $token->supply() . '. Accounts: ' . count($sample->accounts())
-            . '. Lines: ' . $sample->ledger()->count() . '. Held: ' . $sample->held()
-            . '. Replay matches the accounts: ' . ($sample->agrees() ? 'yes' : 'no') . '.</p>' . "\n";
+        $out .= '<p class="stage">Project ' . $this->h($project->handle) . ', stage ' . $this->h($project->stage())
+            . '. Blocking findings: ' . count($review->blockers())
+            . '. Warnings: ' . count($review->warnings())
+            . '. Paper: ' . ($paper->drafted() ? $paper->words() . ' words' : 'not drafted') . '.</p>' . "\n";
 
-        $out .= '<div class="accounts">' . "\n";
-        foreach ($sample->accounts() as $account) {
-            $out .= '<article class="account">' . "\n";
-            $out .= '<h2>' . $this->h($account->holder) . '</h2>' . "\n";
-            $out .= '<p class="holder">Handle ' . $this->h($account->handle) . '.</p>' . "\n";
-            $out .= '<dl class="counts"><dt>Balance</dt><dd class="balance">' . $account->tokens()
-                . ' ' . $this->h($token->symbol) . '</dd>'
-                . '<dt>Replayed</dt><dd class="balance">' . $sample->ledger()->replay($account->handle) . '</dd></dl>' . "\n";
-            $out .= '</article>' . "\n";
+        $out .= '<h2>The token</h2>' . "\n";
+        $out .= '<dl class="facts">';
+        foreach ([
+            'Name' => $project->name,
+            'Symbol' => $project->symbol,
+            'Network' => $project->network->label . ' (' . $project->network->standard . ')',
+            'Decimals' => (string) $project->decimals,
+            'Initial supply' => number_format($project->initialSupply),
+            'Supply' => $project->cap(),
+        ] as $term => $value) {
+            $out .= '<dt>' . $this->h($term) . '</dt><dd>' . $this->h($value) . '</dd>';
         }
-        $out .= '</div>' . "\n";
+        $out .= '</dl>' . "\n";
 
-        $out .= '<h2>The ledger</h2>' . "\n";
-        $out .= '<table class="ledger"><thead><tr><th>Handle</th><th>Move</th><th>Amount</th><th>Why</th><th>Balance</th></tr></thead><tbody>' . "\n";
-        foreach ($sample->ledger()->lines() as $line) {
-            $out .= '<tr><td>' . $this->h($line->handle) . '</td><td>' . $this->h($line->direction)
-                . '</td><td class="num">' . $line->signed() . '</td><td>' . $this->h($line->why)
-                . '</td><td class="num">' . $line->balance . '</td></tr>' . "\n";
+        $out .= '<h2>Contract features</h2>' . "\n";
+        $out .= '<ul class="features">';
+        foreach (['permit', 'mintable', 'burnable', 'pausable', 'unlimitedSupply', 'initialLiquidity'] as $name) {
+            $out .= '<li class="feature">' . $this->h($project->features->label($name)) . '</li>';
+        }
+        $out .= '</ul>' . "\n";
+
+        $out .= '<h2>Tokenomics</h2>' . "\n";
+        $out .= '<table class="buckets"><thead><tr><th>Bucket</th><th>Share</th><th>Tokens</th><th>Holder</th><th>Lock</th></tr></thead><tbody>' . "\n";
+        foreach ($tokenomics->allocations() as $allocation) {
+            $out .= '<tr><td>' . $this->h($allocation->bucket) . '</td><td class="num">'
+                . number_format($tokenomics->share($allocation) / 100, 2) . '%</td><td class="num">'
+                . number_format($allocation->tokens) . '</td><td>' . $this->h($allocation->holder)
+                . '</td><td class="num">' . ($allocation->lockMonths > 0 ? $allocation->lockMonths . ' mo' : 'none')
+                . '</td></tr>' . "\n";
         }
         $out .= '</tbody></table>' . "\n";
 
-        $out .= '<h2>What a member can do</h2>' . "\n";
+        $out .= '<h2>The review</h2>' . "\n";
+        $out .= '<table class="findings"><thead><tr><th>Level</th><th>Code</th><th>What the review saw</th><th>The fix</th></tr></thead><tbody>' . "\n";
+        foreach ($review->findings() as $finding) {
+            $out .= '<tr class="' . $this->h($finding->level) . '"><td>' . $this->h($finding->level)
+                . '</td><td><code>' . $this->h($finding->code) . '</code></td><td>' . $this->h($finding->saw)
+                . '</td><td>' . $this->h($finding->fix) . '</td></tr>' . "\n";
+        }
+        $out .= '</tbody></table>' . "\n";
+
+        $out .= '<h2>A project the review stopped</h2>' . "\n";
+        [$stopped, $stoppedTokenomics, $stoppedReview] = $sample->stopped();
+        $out .= '<p class="stopped">' . $this->h($stopped->name) . ' (' . $this->h($stopped->symbol) . ') holds '
+            . count($stoppedReview->blockers()) . ' blocking findings, so stage stays ' . $this->h($stopped->stage())
+            . ' and the mint stays shut.</p>' . "\n";
+        $out .= '<ul class="blockers">';
+        foreach ($stoppedReview->blockers() as $finding) {
+            $out .= '<li><code>' . $this->h($finding->code) . '</code> ' . $this->h($finding->saw) . '</li>';
+        }
+        $out .= '</ul>' . "\n";
+
+        $out .= '<h2>The white paper</h2>' . "\n";
+        $out .= '<div class="paper">';
+        foreach (explode("\n\n", $paper->draft()) as $paragraph) {
+            $out .= '<p>' . $this->h($paragraph) . '</p>';
+        }
+        $out .= '</div>' . "\n";
+
+        $out .= '<h2>What a founder does</h2>' . "\n";
         $out .= '<ol class="steps">' . "\n";
         foreach ([
-            ['Open an account', 'Create a token account for a network member.'],
-            ['Earn tokens', 'Credit the account when work arrives.'],
-            ['Pay a fee', 'Debit the account when a fee falls due, subject to its balance.'],
-            ['Send tokens', 'Transfer tokens to another account and record both sides of the transfer.'],
-            ['Replay the ledger', 'Rebuild account balances from the recorded ledger lines.'],
+            ['Define the token', "Define the token's name, symbol, network, supply limits, decimals and contract features."],
+            ['Divide the supply', "Divide the supply into allocations, set lock and cliff periods, and describe the token's utility, demand, emission and treasury."],
+            ['Run the review', 'Run the review, resolve every blocker, run it again until it passes, then generate the white paper and mint the token.'],
         ] as [$step, $line]) {
             $out .= '<li><strong>' . $this->h($step) . '</strong> ' . $this->h($line) . '</li>' . "\n";
         }

@@ -34,33 +34,38 @@ p { margin: 0 0 1rem; }
   padding-top: 0.7rem;
 }
 
-.accounts { display: grid; gap: 1.2rem; margin: 1.5rem 0; }
+dl.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1.2rem;
+  margin: 0.8rem 0 0;
+  font-size: 0.95rem;
+}
+dl.facts dt { color: #666; }
+dl.facts dd { margin: 0; font-variant-numeric: tabular-nums; }
 
-.account {
+ul.features { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.8rem 0 0; }
+li.feature {
   border: 1px solid var(--rule);
-  padding: 1rem 1.2rem;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.85rem;
+  color: #444;
   background: #fff;
 }
 
-.holder { font-size: 0.95rem; color: #444; }
+table.buckets, table.findings { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.8rem; }
+table.buckets th, table.buckets td, table.findings th, table.findings td { text-align: left; padding: 0.3rem 0.5rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.buckets th, table.findings th { color: #666; font-weight: normal; }
+table.buckets td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.findings tr.blocker td:first-child { color: var(--mark); }
+table.findings tr.warning td:first-child { color: #8a6a00; }
+table.findings code { font-size: 0.82rem; color: #555; }
 
-.counts {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 0.25rem 1rem;
-  margin: 0.6rem 0 0;
-  font-size: 0.92rem;
-}
+.stopped { font-size: 0.95rem; }
+ul.blockers { padding-left: 1.2rem; font-size: 0.92rem; color: var(--mark); }
 
-.counts dt { color: #666; }
-.counts dd { margin: 0; font-variant-numeric: tabular-nums; }
-
-table.ledger { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.8rem; }
-table.ledger th, table.ledger td { text-align: left; padding: 0.3rem 0.5rem; border-bottom: 1px solid var(--rule); }
-table.ledger th { color: #666; font-weight: normal; }
-table.ledger td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.paper { border: 1px solid var(--rule); background: #fff; padding: 1rem 1.3rem; font-size: 0.95rem; }
+.paper p:last-child { margin-bottom: 0; }
 
 .steps { padding-left: 1.2rem; font-size: 0.95rem; }
 .steps li { margin-bottom: 0.6rem; }
-
-.balance { font-variant-numeric: tabular-nums; }

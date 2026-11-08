@@ -24,13 +24,19 @@ final class Front
         $router->get('/', static fn (): array => [200, [
             'html' => $views->page(new Sample()),
         ]]);
-        $router->get('/health', static fn (): array => [200, ['json' => [
-            'ok' => true,
-            'accounts' => count((new Sample())->accounts()),
-            'lines' => (new Sample())->ledger()->count(),
-            'held' => (new Sample())->held(),
-            'agrees' => (new Sample())->agrees(),
-        ]]]);
+        $router->get('/health', static function (): array {
+            $sample = new Sample();
+            $review = $sample->review();
+
+            return [200, ['json' => [
+                'ok' => true,
+                'stage' => $sample->project()->stage(),
+                'blockers' => count($review->blockers()),
+                'warnings' => count($review->warnings()),
+                'buckets' => count($sample->tokenomics()->allocations()),
+                'paper_words' => $sample->paper()->words(),
+            ]]];
+        });
 
         [$status, $body] = $router->handle(
             $_SERVER['REQUEST_METHOD'] ?? 'GET',
