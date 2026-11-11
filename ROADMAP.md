@@ -1,6 +1,6 @@
 ## Roadmap
 
-TokenUp keeps whole-number token accounts and one ledger that a reader can replay into the balances. A transfer writes both sides. The hand-written runner carries 16 checks.
+TokenUp compares a contract draft with a tokenomics draft, classifies each finding as a blocker or a warning, and mints nothing while a blocker stands. The hand-written runner carries 43 checks.
 
 1. Add a statement per account, so a member reads the lines that touched the balance in order.
 2. Add a closing balance per period, so two readers can compare the ledger at the same day.

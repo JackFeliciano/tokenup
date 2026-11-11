@@ -50,8 +50,8 @@ HTML;
     public function page(Sample $sample): string
     {
         $TITLE = 'TokenUp, a token project checked before it mints';
-        $LEDE = 'TokenUp helps founders build, review and launch token projects by checking the token design against its tokenomics before minting.';
-        $WHAT = 'TokenUp guides founders through token creation and tokenomics, from contract features and supply limits to allocations, vesting and treasury plans. Its review compares both drafts, identifies inconsistencies and marks each finding as a blocker or warning. Founders resolve blockers before minting, then generate a white paper from the approved tokenomics.';
+        $LEDE = 'TokenUp checks whether a token\'s contract design matches its tokenomics before minting, so a founder can see the flaw while the token is still a draft.';
+        $WHAT = 'Founders define the token, allocate its supply and describe its economic purpose. The review compares both plans, identifies inconsistencies and classifies each finding as a blocker or warning. Blockers prevent minting until the founder makes corrections.';
 
         $project = $sample->project();
         $tokenomics = $sample->tokenomics();
@@ -70,68 +70,9 @@ HTML;
         $out .= '<h2>The token</h2>' . "\n";
         $out .= '<dl class="facts">';
         foreach ([
-            'Name' => $project->name,
-            'Symbol' => $project->symbol,
-            'Network' => $project->network->label . ' (' . $project->network->standard . ')',
-            'Decimals' => (string) $project->decimals,
-            'Initial supply' => number_format($project->initialSupply),
-            'Supply' => $project->cap(),
-        ] as $term => $value) {
-            $out .= '<dt>' . $this->h($term) . '</dt><dd>' . $this->h($value) . '</dd>';
-        }
-        $out .= '</dl>' . "\n";
-
-        $out .= '<h2>Contract features</h2>' . "\n";
-        $out .= '<ul class="features">';
-        foreach (['permit', 'mintable', 'burnable', 'pausable', 'unlimitedSupply', 'initialLiquidity'] as $name) {
-            $out .= '<li class="feature">' . $this->h($project->features->label($name)) . '</li>';
-        }
-        $out .= '</ul>' . "\n";
-
-        $out .= '<h2>Tokenomics</h2>' . "\n";
-        $out .= '<table class="buckets"><thead><tr><th>Bucket</th><th>Share</th><th>Tokens</th><th>Holder</th><th>Lock</th></tr></thead><tbody>' . "\n";
-        foreach ($tokenomics->allocations() as $allocation) {
-            $out .= '<tr><td>' . $this->h($allocation->bucket) . '</td><td class="num">'
-                . number_format($tokenomics->share($allocation) / 100, 2) . '%</td><td class="num">'
-                . number_format($allocation->tokens) . '</td><td>' . $this->h($allocation->holder)
-                . '</td><td class="num">' . ($allocation->lockMonths > 0 ? $allocation->lockMonths . ' mo' : 'none')
-                . '</td></tr>' . "\n";
-        }
-        $out .= '</tbody></table>' . "\n";
-
-        $out .= '<h2>The review</h2>' . "\n";
-        $out .= '<table class="findings"><thead><tr><th>Level</th><th>Code</th><th>What the review saw</th><th>The fix</th></tr></thead><tbody>' . "\n";
-        foreach ($review->findings() as $finding) {
-            $out .= '<tr class="' . $this->h($finding->level) . '"><td>' . $this->h($finding->level)
-                . '</td><td><code>' . $this->h($finding->code) . '</code></td><td>' . $this->h($finding->saw)
-                . '</td><td>' . $this->h($finding->fix) . '</td></tr>' . "\n";
-        }
-        $out .= '</tbody></table>' . "\n";
-
-        $out .= '<h2>A project the review stopped</h2>' . "\n";
-        [$stopped, $stoppedTokenomics, $stoppedReview] = $sample->stopped();
-        $out .= '<p class="stopped">' . $this->h($stopped->name) . ' (' . $this->h($stopped->symbol) . ') holds '
-            . count($stoppedReview->blockers()) . ' blocking findings, so stage stays ' . $this->h($stopped->stage())
-            . ' and the mint stays shut.</p>' . "\n";
-        $out .= '<ul class="blockers">';
-        foreach ($stoppedReview->blockers() as $finding) {
-            $out .= '<li><code>' . $this->h($finding->code) . '</code> ' . $this->h($finding->saw) . '</li>';
-        }
-        $out .= '</ul>' . "\n";
-
-        $out .= '<h2>The white paper</h2>' . "\n";
-        $out .= '<div class="paper">';
-        foreach (explode("\n\n", $paper->draft()) as $paragraph) {
-            $out .= '<p>' . $this->h($paragraph) . '</p>';
-        }
-        $out .= '</div>' . "\n";
-
-        $out .= '<h2>What a founder does</h2>' . "\n";
-        $out .= '<ol class="steps">' . "\n";
-        foreach ([
-            ['Define the token', "Define the token's name, symbol, network, supply limits, decimals and contract features."],
-            ['Divide the supply', "Divide the supply into allocations, set lock and cliff periods, and describe the token's utility, demand, emission and treasury."],
-            ['Run the review', 'Run the review, resolve every blocker, run it again until it passes, then generate the white paper and mint the token.'],
+            ['Define the token', 'Define the token, allocate its supply and describe its economic purpose.'],
+            ['Run the review', 'The review compares the contract design with the tokenomics and classifies each finding as a blocker or a warning.'],
+            ['Mint the token', 'Once the review passes, TokenUp generates a white paper from the tokenomics and mints the token.'],
         ] as [$step, $line]) {
             $out .= '<li><strong>' . $this->h($step) . '</strong> ' . $this->h($line) . '</li>' . "\n";
         }

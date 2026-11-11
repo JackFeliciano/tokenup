@@ -2,7 +2,9 @@
 
 ## What the project is
 
-TokenUp is a PHP 8.3 programme that keeps token accounts for members of a network. Each account holds a whole-number balance. Tokens represent a unit of work and carry a symbol.
+TokenUp checks whether a token's contract design matches its tokenomics before minting, so a founder can see the flaw while the token is still a draft.
+
+Founders define the token, allocate its supply and describe its economic purpose. The review compares both plans, identifies inconsistencies and classifies each finding as a blocker or warning. Blockers prevent minting until the founder makes corrections.
 
 The programme supports credits, debits and transfers. A credit adds tokens when work arrives. A debit takes tokens when a fee falls due, but the account refuses a debit larger than its balance. A transfer moves tokens between 2 accounts and writes 1 ledger line on each side. An account cannot send tokens to itself.
 
